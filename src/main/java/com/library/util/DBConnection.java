@@ -1,7 +1,6 @@
 package com.library.util;
 
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -11,9 +10,10 @@ public class DBConnection {
     private static Properties props = new Properties();
 
     static {
-        try (FileInputStream input = new FileInputStream("db.properties")) {
+        try (InputStream input = DBConnection.class.getClassLoader()
+                .getResourceAsStream("db.properties")) {
             props.load(input);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

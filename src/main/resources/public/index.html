@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; }
+
+        nav {
+            background: #2c3e50;
+            padding: 15px 30px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        nav h1 { color: white; font-size: 20px; margin-right: auto; }
+        nav button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        nav button:hover { background: #2980b9; }
+        nav button.active { background: #e74c3c; }
+
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .card h2 { color: #2c3e50; margin-bottom: 20px; font-size: 18px; }
+
+        input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 5px;
+            font-size: 14px;
+            width: 200px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        .btn-add { background: #27ae60; color: white; }
+        .btn-add:hover { background: #219a52; }
+        .btn-edit { background: #f39c12; color: white; padding: 5px 10px; font-size: 12px; }
+        .btn-delete { background: #e74c3c; color: white; padding: 5px 10px; font-size: 12px; }
+        .btn-issue { background: #3498db; color: white; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background: #2c3e50; color: white; padding: 12px; text-align: left; }
+        td { padding: 10px 12px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f8f9fa; }
+
+        .msg { padding: 10px; border-radius: 5px; margin: 10px 0; display: none; }
+        .msg.success { background: #d4edda; color: #155724; }
+        .msg.error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <h1>📚 Library Management System</h1>
+    <button class="active" onclick="showSection('books')">Books</button>
+    <button onclick="showSection('members')">Members</button>
+    <button onclick="showSection('transactions')">Issue / Return</button>
+</nav>
+
+<div class="container">
+
+    <!-- BOOKS SECTION -->
+    <div id="books" class="section active">
+        <div class="card">
+            <h2>Add New Book</h2>
+            <input type="text" id="bookTitle" placeholder="Title">
+            <input type="text" id="bookAuthor" placeholder="Author">
+            <input type="text" id="bookIsbn" placeholder="ISBN">
+            <input type="number" id="bookCopies" placeholder="Copies">
+            <button class="btn-add" onclick="addBook()">Add Book</button>
+            <div id="bookMsg" class="msg"></div>
+        </div>
+        <div class="card">
+            <h2>All Books</h2>
+            <table id="booksTable">
+                <thead>
+                <tr>
+                    <th>ID</th><th>Title</th><th>Author</th>
+                    <th>ISBN</th><th>Copies</th><th>Actions</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MEMBERS SECTION -->
+    <div id="members" class="section">
+        <div class="card">
+            <h2>Add New Member</h2>
+            <input type="text" id="memberName" placeholder="Name">
+            <input type="email" id="memberEmail" placeholder="Email">
+            <input type="text" id="memberPhone" placeholder="Phone">
+            <button class="btn-add" onclick="addMember()">Add Member</button>
+            <div id="memberMsg" class="msg"></div>
+        </div>
+        <div class="card">
+            <h2>All Members</h2>
+            <table id="membersTable">
+                <thead>
+                <tr>
+                    <th>ID</th><th>Name</th><th>Email</th>
+                    <th>Phone</th><th>Actions</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- TRANSACTIONS SECTION -->
+    <div id="transactions" class="section">
+        <div class="card">
+            <h2>Issue a Book</h2>
+            <input type="number" id="issueBookId" placeholder="Book ID">
+            <input type="number" id="issueMemberId" placeholder="Member ID">
+            <button class="btn-issue" onclick="issueBook()">Issue Book</button>
+            <div id="issueMsg" class="msg"></div>
+        </div>
+        <div class="card">
+            <h2>Return a Book</h2>
+            <input type="number" id="returnTxnId" placeholder="Transaction ID">
+            <button class="btn-add" onclick="returnBook()">Return Book</button>
+            <div id="returnMsg" class="msg"></div>
+        </div>
+        <div class="card">
+            <h2>Currently Issued Books</h2>
+            <button class="btn-issue" onclick="loadIssued()">Refresh</button>
+            <table id="issuedTable">
+                <thead>
+                <tr>
+                    <th>Txn ID</th><th>Book</th>
+                    <th>Issued To</th><th>Date</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const BASE = "http://localhost:4567";
+
+    function showSection(name) {
+        $(".section").removeClass("active");
+        $("nav button").removeClass("active");
+        $("#" + name).addClass("active");
+        event.target.classList.add("active");
+        if (name === "books") loadBooks();
+        if (name === "members") loadMembers();
+        if (name === "transactions") loadIssued();
+    }
+
+    function showMsg(id, text, type) {
+        $("#" + id).removeClass("success error").addClass(type).text(text).show();
+        setTimeout(() => $("#" + id).hide(), 3000);
+    }
+
+    // ===== BOOKS =====
+    function loadBooks() {
+        $.get(BASE + "/books", function(data) {
+            let rows = "";
+            data.forEach(b => {
+                rows += `<tr>
+                <td>${b.bookId}</td>
+                <td>${b.title}</td>
+                <td>${b.author}</td>
+                <td>${b.isbn}</td>
+                <td>${b.availableCopies}</td>
+                <td>
+                    <button class="btn-edit" onclick="editBook(${b.bookId}, '${b.title}', '${b.author}', '${b.isbn}', ${b.availableCopies})">Edit</button>
+                    <button class="btn-delete" onclick="deleteBook(${b.bookId})">Delete</button>
+                </td>
+            </tr>`;
+            });
+            $("#booksTable tbody").html(rows);
+        });
+    }
+
+    function addBook() {
+        let book = {
+            title: $("#bookTitle").val(),
+            author: $("#bookAuthor").val(),
+            isbn: $("#bookIsbn").val(),
+            availableCopies: parseInt($("#bookCopies").val())
+        };
+        $.ajax({ url: BASE + "/books", type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(book),
+            success: function() {
+                showMsg("bookMsg", "Book added!", "success");
+                $("#bookTitle, #bookAuthor, #bookIsbn, #bookCopies").val("");
+                loadBooks();
+            },
+            error: function() { showMsg("bookMsg", "Error adding book.", "error"); }
+        });
+    }
+
+    function editBook(id, title, author, isbn, copies) {
+        let newTitle = prompt("Title:", title);
+        if (!newTitle) return;
+        let newAuthor = prompt("Author:", author);
+        let newIsbn = prompt("ISBN:", isbn);
+        let newCopies = prompt("Copies:", copies);
+        $.ajax({ url: BASE + "/books/" + id, type: "PUT",
+            contentType: "application/json",
+            data: JSON.stringify({ title: newTitle, author: newAuthor, isbn: newIsbn, availableCopies: parseInt(newCopies) }),
+            success: function() { showMsg("bookMsg", "Book updated!", "success"); loadBooks(); },
+            error: function() { showMsg("bookMsg", "Error updating book.", "error"); }
+        });
+    }
+
+    function deleteBook(id) {
+        if (!confirm("Delete this book?")) return;
+        $.ajax({ url: BASE + "/books/" + id, type: "DELETE",
+            success: function() { showMsg("bookMsg", "Book deleted!", "success"); loadBooks(); },
+            error: function() { showMsg("bookMsg", "Error deleting book.", "error"); }
+        });
+    }
+
+    // ===== MEMBERS =====
+    function loadMembers() {
+        $.get(BASE + "/members", function(data) {
+            let rows = "";
+            data.forEach(m => {
+                rows += `<tr>
+                <td>${m.memberId}</td>
+                <td>${m.name}</td>
+                <td>${m.email}</td>
+                <td>${m.phone}</td>
+                <td>
+                    <button class="btn-edit" onclick="editMember(${m.memberId}, '${m.name}', '${m.email}', '${m.phone}')">Edit</button>
+                    <button class="btn-delete" onclick="deleteMember(${m.memberId})">Delete</button>
+                </td>
+            </tr>`;
+            });
+            $("#membersTable tbody").html(rows);
+        });
+    }
+
+    function addMember() {
+        let member = {
+            name: $("#memberName").val(),
+            email: $("#memberEmail").val(),
+            phone: $("#memberPhone").val()
+        };
+        $.ajax({ url: BASE + "/members", type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(member),
+            success: function() {
+                showMsg("memberMsg", "Member added!", "success");
+                $("#memberName, #memberEmail, #memberPhone").val("");
+                loadMembers();
+            },
+            error: function() { showMsg("memberMsg", "Error adding member.", "error"); }
+        });
+    }
+
+    function editMember(id, name, email, phone) {
+        let newName = prompt("Name:", name);
+        if (!newName) return;
+        let newEmail = prompt("Email:", email);
+        let newPhone = prompt("Phone:", phone);
+        $.ajax({ url: BASE + "/members/" + id, type: "PUT",
+            contentType: "application/json",
+            data: JSON.stringify({ name: newName, email: newEmail, phone: newPhone }),
+            success: function() { showMsg("memberMsg", "Member updated!", "success"); loadMembers(); },
+            error: function() { showMsg("memberMsg", "Error updating member.", "error"); }
+        });
+    }
+
+    function deleteMember(id) {
+        if (!confirm("Delete this member?")) return;
+        $.ajax({ url: BASE + "/members/" + id, type: "DELETE",
+            success: function() { showMsg("memberMsg", "Member deleted!", "success"); loadMembers(); },
+            error: function() { showMsg("memberMsg", "Error deleting member.", "error"); }
+        });
+    }
+
+    // ===== TRANSACTIONS =====
+    function issueBook() {
+        let bookId = $("#issueBookId").val();
+        let memberId = $("#issueMemberId").val();
+        $.post(BASE + "/issue?bookId=" + bookId + "&memberId=" + memberId,
+            function() { showMsg("issueMsg", "Book issued!", "success"); loadIssued(); })
+            .fail(function() { showMsg("issueMsg", "Error issuing book.", "error"); });
+    }
+
+    function returnBook() {
+        let txnId = $("#returnTxnId").val();
+        $.post(BASE + "/return?txnId=" + txnId,
+            function() { showMsg("returnMsg", "Book returned!", "success"); loadIssued(); })
+            .fail(function() { showMsg("returnMsg", "Error returning book.", "error"); });
+    }
+
+    function loadIssued() {
+        $.get(BASE + "/issued", function(data) {
+            let rows = "";
+            data.forEach(i => { rows += `<tr><td colspan="4">${i}</td></tr>`; });
+            $("#issuedTable tbody").html(rows || "<tr><td colspan='4'>No books currently issued.</td></tr>");
+        });
+    }
+
+    // Load books on start
+    $(document).ready(function() { loadBooks(); });
+</script>
+
+</body>
+</html>
