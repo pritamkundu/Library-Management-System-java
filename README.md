@@ -59,6 +59,19 @@ Three relational tables with foreign key constraints:
 4. Run `LibraryAPI.java` to start the web server
 5. Open `http://localhost:4567` in your browser
 
+## 🖥️ Live Preview
+
+## 📸 Screenshots
+
+### Books Management
+![Books](screenshots/books.png)
+
+### Members Management
+![Members](screenshots/members.png)
+
+### Issue / Return
+![Transactions](screenshots/transactions.png)
+
 ## What I Learned
 
 - Implementing the DAO pattern for clean separation between business logic and database access
